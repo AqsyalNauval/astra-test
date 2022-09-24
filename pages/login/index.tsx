@@ -1,4 +1,4 @@
-import { Button, Form, Input } from "antd";
+import { Button, Col, Form, Input, Space } from "antd";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -57,19 +57,34 @@ const Login = () => {
         <link rel="manifest" href="/manifest.json" />
       </Head>
       <div style={{ paddingTop: "20px" }}>
-        <Form {...layout} name="nest-messages" onFinish={submit}>
+        <Form {...layout} name="nest-messages">
           <Form.Item label="Username">
             <Input onChange={(e) => setUsername(e.target.value)} />
           </Form.Item>
-
           <Form.Item label="Password">
             <Input.Password onChange={(e) => setPassword(e.target.value)} />
           </Form.Item>
 
           <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-            <Button type="primary" htmlType="submit">
-              Login
-            </Button>
+            <Space>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="login-form-button"
+                onClick={() => submit()}
+              >
+                Login
+              </Button>
+
+              <Button
+                onClick={() => router.push("/login/register")}
+                type="primary"
+                htmlType="submit"
+                className="login-form-button"
+              >
+                Register
+              </Button>
+            </Space>
           </Form.Item>
         </Form>
       </div>
