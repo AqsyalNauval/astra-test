@@ -24,14 +24,9 @@ API.authLogin = async (datas) => {
     return data;
 }
 
-API.getArticles = async (token, params) => {
+API.getArticles = async (token, page) => {
 
-    // const {
-    //     pageSize = 10,
-    //     page = 1
-    // } = params;
-
-    const url = `${URL.articlesAPI}?pagination%5bpageSize%5d=${10}&pagination%5bpage%5d=${1}`
+    const url = `${URL.articlesAPI}?pagination%5bpageSize%5d=10&pagination%5bpage%5d=${page}`
     const { data } = await axios.get(url, headersWithToken(token))
     return data;
 }

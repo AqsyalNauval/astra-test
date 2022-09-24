@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import API from "../api";
 import Swal from "sweetalert2";
+import Head from "next/head";
 
 type DataDetailType = {
   attributes: {
@@ -27,6 +28,9 @@ const Home = () => {
   const [isModalCreate, setIsModalCreate] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [totalPage, setTotalPage] = useState(0);
+  const [value, setValue] = useState("");
+  const [dataSource, setDataSource] = useState("");
 
   interface DataType {
     key: string;
@@ -53,11 +57,12 @@ const Home = () => {
     },
   });
 
-  const getData = async () => {
+  const getData = async (page: any) => {
     try {
       const token = JSON.parse(localStorage.getItem("accessToken") || "{}");
-      const res = await API.getArticles(token);
+      const res = await API.getArticles(token, page);
       setData(res.data);
+      setTotalPage(res.meta.pagination.total);
     } catch (err) {}
   };
 
@@ -85,7 +90,7 @@ const Home = () => {
         icon: "success",
         title: "Update Berhasil",
       });
-      await getData();
+      await getData(1);
       setIsModalEdit(false);
     } catch (err) {}
   };
@@ -104,7 +109,7 @@ const Home = () => {
         icon: "success",
         title: "Update Berhasil",
       });
-      await getData();
+      await getData(1);
       setIsModalCreate(false);
     } catch (err) {}
   };
@@ -124,7 +129,7 @@ const Home = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           await API.deleteArticles(token, dataDetail.id);
-          getData();
+          getData(1);
           Swal.fire("Berhasil!", "Data Telah Di Hapus", "success");
         }
       });
@@ -169,8 +174,33 @@ const Home = () => {
   };
 
   useEffect(() => {
-    getData();
+    if ("accessToken" in localStorage === false) {
+      route.push("/login");
+    }
+    getData(1);
   }, []);
+
+  const filteredData = data.filter(
+    (entry: any) =>
+      entry.attributes.title.toLowerCase().indexOf(value.toLowerCase()) !== -1
+  );
+  const FilterByNameInput = (
+    <Input
+      placeholder="Search Name"
+      value={value}
+      onChange={(e) => {
+        const currValue = e.target.value;
+        setValue(currValue);
+        const filteredData = data.filter(
+          (entry: any) =>
+            entry.attributes.title
+              .toLowerCase()
+              .indexOf(value.toLowerCase()) !== -1
+        );
+        setData(filteredData);
+      }}
+    />
+  );
 
   const columns: ColumnsType<DataType> = [
     {
@@ -179,7 +209,7 @@ const Home = () => {
       render: (text, record, index) => index + 1,
     },
     {
-      title: "Title",
+      title: FilterByNameInput,
       dataIndex: "title",
       key: "title",
       render: (_, { attributes }) => (
@@ -195,6 +225,9 @@ const Home = () => {
           {moment(attributes.createdAt).format("DD/MM/YYYY")}
         </div>
       ),
+      sorter: (a, b) =>
+        moment(a.attributes.createdAt).unix() -
+        moment(b.attributes.createdAt).unix(),
     },
     {
       title: "Status",
@@ -220,110 +253,128 @@ const Home = () => {
   ];
 
   return (
-    <PageHeader
-      ghost={false}
-      title="List Articles"
-      extra={[
-        <Button onClick={() => showModalCreate()} key="1" type="ghost">
-          Create Article
-        </Button>,
-        <Button onClick={() => route.push("/login")} key="2" type="primary">
-          Login
-        </Button>,
-      ]}
-    >
-      <Table
-        onRow={(record, rowIndex) => {
-          return {
-            onClick: () => {
-              getDetailData(record.id);
+    <>
+      <Head>
+        <link rel="manifest" href="/manifest.json" />
+      </Head>
+      <PageHeader
+        ghost={false}
+        title="List Articles"
+        extra={[
+          <Button onClick={() => showModalCreate()} key="1" type="ghost">
+            Create Article
+          </Button>,
+          <Button
+            onClick={() => {
+              localStorage.clear(), route.push("/login");
+            }}
+            key="2"
+            type="primary"
+          >
+            Logout
+          </Button>,
+        ]}
+      >
+        <Table
+          onRow={(record, rowIndex) => {
+            return {
+              onClick: () => {
+                getDetailData(record.id);
+              },
+            };
+          }}
+          columns={columns}
+          dataSource={filteredData}
+          pagination={{
+            pageSize: 10,
+            total: totalPage,
+            onChange: (page: number) => {
+              getData(page);
             },
-          };
-        }}
-        columns={columns}
-        dataSource={data}
-      />
+          }}
+        />
 
-      <Modal
-        title="Detail "
-        open={isModalDetail}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <table className="table-detail">
-          <tr>
-            <th>Title</th>
-            <th>Content</th>
-            <th>Created At</th>
-            <th>Updated At</th>
-          </tr>
-          <tr>
-            <td>{dataDetail?.attributes?.title}</td>
-            <td>{dataDetail?.attributes?.content}</td>
-            <td>
-              {moment(dataDetail?.attributes?.createdAt).format("DD/MM/YYYY")}
-            </td>
-            <td>
-              {moment(dataDetail?.attributes?.updatedAt).format("DD/MM/YYYY")}
-            </td>
-          </tr>
-        </table>
-      </Modal>
+        <Modal
+          title="Detail "
+          open={isModalDetail}
+          onOk={handleOk}
+          onCancel={handleCancel}
+        >
+          <table className="table-detail">
+            <tr>
+              <th>Title</th>
+              <th>Content</th>
+              <th>Created At</th>
+              <th>Updated At</th>
+            </tr>
+            <tr>
+              <td>{dataDetail?.attributes?.title}</td>
+              <td>{dataDetail?.attributes?.content}</td>
+              <td>
+                {moment(dataDetail?.attributes?.createdAt).format("DD/MM/YYYY")}
+              </td>
+              <td>
+                {moment(dataDetail?.attributes?.updatedAt).format("DD/MM/YYYY")}
+              </td>
+            </tr>
+          </table>
+        </Modal>
 
-      <Modal
-        title="Edit"
-        open={isModalEdit}
-        onOk={handleOkEdit}
-        onCancel={handleCancelEdit}
-      >
-        <Form name="nest-messages">
-          <Form.Item label="Title">
-            <Input onChange={(e) => setTitle(e.target.value)} />
-          </Form.Item>
+        <Modal
+          title="Edit"
+          open={isModalEdit}
+          onOk={handleOkEdit}
+          onCancel={handleCancelEdit}
+        >
+          <Form name="nest-messages">
+            <Form.Item label="Title">
+              <Input onChange={(e) => setTitle(e.target.value)} />
+            </Form.Item>
 
-          <Form.Item label="Content">
-            <Input onChange={(e) => setContent(e.target.value)} />
-          </Form.Item>
+            <Form.Item label="Content">
+              <Input onChange={(e) => setContent(e.target.value)} />
+            </Form.Item>
 
-          <Form.Item>
-            <Button
-              onClick={() => editArticles()}
-              type="primary"
-              htmlType="submit"
-            >
-              Edit
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+            <Form.Item>
+              <Button
+                onClick={() => editArticles()}
+                type="primary"
+                htmlType="submit"
+              >
+                Edit
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
 
-      <Modal
-        title="Create"
-        open={isModalCreate}
-        onOk={handleOkCreate}
-        onCancel={handleCancelCreate}
-      >
-        <Form name="nest-messages">
-          <Form.Item label="Title">
-            <Input onChange={(e) => setTitle(e.target.value)} />
-          </Form.Item>
+        <Modal
+          title="Create"
+          open={isModalCreate}
+          onOk={handleOkCreate}
+          onCancel={handleCancelCreate}
+        >
+          <Form name="nest-messages">
+            <Form.Item label="Title">
+              <Input onChange={(e) => setTitle(e.target.value)} />
+            </Form.Item>
 
-          <Form.Item label="Content">
-            <Input onChange={(e) => setContent(e.target.value)} />
-          </Form.Item>
+            <Form.Item label="Content">
+              <Input onChange={(e) => setContent(e.target.value)} />
+            </Form.Item>
 
-          <Form.Item>
-            <Button
-              onClick={() => createArticles()}
-              type="primary"
-              htmlType="submit"
-            >
-              Create
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </PageHeader>
+            <Form.Item>
+              <Button
+                onClick={() => createArticles()}
+                type="primary"
+                htmlType="submit"
+              >
+                Create
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+      </PageHeader>
+    </>
   );
 };
 

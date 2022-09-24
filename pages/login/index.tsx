@@ -1,4 +1,5 @@
 import { Button, Form, Input } from "antd";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import Swal from "sweetalert2";
@@ -51,23 +52,28 @@ const Login = () => {
   };
 
   return (
-    <div style={{ paddingTop: "20px" }}>
-      <Form {...layout} name="nest-messages" onFinish={submit}>
-        <Form.Item label="Username">
-          <Input onChange={(e) => setUsername(e.target.value)} />
-        </Form.Item>
+    <>
+      <Head>
+        <link rel="manifest" href="/manifest.json" />
+      </Head>
+      <div style={{ paddingTop: "20px" }}>
+        <Form {...layout} name="nest-messages" onFinish={submit}>
+          <Form.Item label="Username">
+            <Input onChange={(e) => setUsername(e.target.value)} />
+          </Form.Item>
 
-        <Form.Item label="Password">
-          <Input.Password onChange={(e) => setPassword(e.target.value)} />
-        </Form.Item>
+          <Form.Item label="Password">
+            <Input.Password onChange={(e) => setPassword(e.target.value)} />
+          </Form.Item>
 
-        <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-          <Button type="primary" htmlType="submit">
-            Login
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
+          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
+            <Button type="primary" htmlType="submit">
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
+    </>
   );
 };
 
