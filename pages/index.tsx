@@ -299,6 +299,7 @@ const Home = () => {
           open={isModalDetail}
           onOk={handleOk}
           onCancel={handleCancel}
+          footer={null}
         >
           <table className="table-detail">
             <tr>
@@ -325,6 +326,7 @@ const Home = () => {
           open={isModalEdit}
           onOk={handleOkEdit}
           onCancel={handleCancelEdit}
+          footer={null}
         >
           <Form name="nest-messages">
             <Form.Item label="Title">
@@ -352,6 +354,7 @@ const Home = () => {
           open={isModalCreate}
           onOk={handleOkCreate}
           onCancel={handleCancelCreate}
+          footer={null}
         >
           <Form name="nest-messages">
             <Form.Item label="Title">
