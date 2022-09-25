@@ -186,7 +186,7 @@ const Home = () => {
   );
   const FilterByNameInput = (
     <Input
-      placeholder="Search Name"
+      placeholder="Search Title"
       value={value}
       onChange={(e) => {
         const currValue = e.target.value;
@@ -228,11 +228,6 @@ const Home = () => {
       sorter: (a, b) =>
         moment(a.attributes.createdAt).unix() -
         moment(b.attributes.createdAt).unix(),
-    },
-    {
-      title: "Status",
-      key: "status",
-      dataIndex: "tags",
     },
     {
       title: "Action",

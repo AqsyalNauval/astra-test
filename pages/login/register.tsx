@@ -31,11 +31,6 @@ const Register = () => {
     },
   });
 
-  const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 8 },
-  };
-
   const submit = async () => {
     var formData = new FormData();
     var regularExpression =
@@ -94,9 +89,8 @@ const Register = () => {
       <Head>
         <link rel="manifest" href="/manifest.json" />
       </Head>
-      <div style={{ padding: "20px" }}>
+      <div className="page">
         <Form
-          {...layout}
           name="nest-messages"
           onFinish={submit}
           validateMessages={validateMessages}
@@ -123,7 +117,7 @@ const Register = () => {
             />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
+          <Form.Item>
             <Button type="primary" htmlType="submit">
               Register
             </Button>

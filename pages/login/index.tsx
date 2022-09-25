@@ -23,11 +23,6 @@ const Login = () => {
     },
   });
 
-  const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 8 },
-  };
-
   const submit = async () => {
     var formData = new FormData();
 
@@ -56,8 +51,8 @@ const Login = () => {
       <Head>
         <link rel="manifest" href="/manifest.json" />
       </Head>
-      <div style={{ paddingTop: "20px" }}>
-        <Form {...layout} name="nest-messages">
+      <div className="page">
+        <Form name="normal-login" className="login-form">
           <Form.Item label="Username">
             <Input onChange={(e) => setUsername(e.target.value)} />
           </Form.Item>
@@ -65,7 +60,7 @@ const Login = () => {
             <Input.Password onChange={(e) => setPassword(e.target.value)} />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
+          <Form.Item>
             <Space>
               <Button
                 type="primary"
@@ -75,7 +70,6 @@ const Login = () => {
               >
                 Login
               </Button>
-
               <Button
                 onClick={() => router.push("/login/register")}
                 type="primary"

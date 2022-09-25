@@ -34,6 +34,16 @@ a {
   color: white;
 }
 
+.page {
+  padding: 25px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #d3d3d3;
+  border-radius: 10px;
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
